@@ -1,5 +1,5 @@
 import unittest
-from collections.abc import Sequence, Container, Sized, Iterable
+from collections.abc import Sequence, Container, Sized, Iterable, Set
 from sorted_set import SortedSet
 
 
@@ -231,6 +231,152 @@ class TestInEqualityProtocol(unittest.TestCase):
         s = SortedSet([5, 4])
         self.assertFalse(s != s)
 
+class TestRelationalSetProtocol(unittest.TestCase):
+
+    def test_lt_positive(self):
+        s = SortedSet({1, 2})
+        t = SortedSet({1, 2, 3})
+        self.assertTrue(s < t)
+
+    def test_lt_negative(self):
+        s = SortedSet({1, 2, 3})
+        t = SortedSet({1, 2, 3})
+        self.assertFalse(s < t)
+
+    def test_le_lt_positive(self):
+        s = SortedSet({1, 2})
+        t = SortedSet({1, 2, 3})
+        self.assertTrue(s <= t)
+
+    def test_le_eq_positive(self):
+        s = SortedSet({1, 2, 3})
+        t = SortedSet({1, 2, 3})
+        self.assertTrue(s <= t)
+
+    def test_le_negative(self):
+        s = SortedSet({1, 2, 3})
+        t = SortedSet({1, 2})
+        self.assertFalse(s <= t)
+
+    def test_gt_positive(self):
+        s = SortedSet({1, 2, 3})
+        t = SortedSet({1, 2})
+        self.assertTrue(s > t)
+
+    def test_gt_negative(self):
+        s = SortedSet({1, 2})
+        t = SortedSet({1, 2, 3})
+        self.assertFalse(s > t)
+
+    def test_ge_gt_positive(self):
+        s = SortedSet({1, 2, 3})
+        t = SortedSet({1, 2})
+        self.assertTrue(s > t)
+
+    def test_ge_eq_positive(self):
+        s = SortedSet({1, 2, 3})
+        t = SortedSet({1, 2, 3})
+        self.assertTrue(s >= t)
+
+    def test_ge_negative(self):
+        s = SortedSet({1, 2})
+        t = SortedSet({1, 2, 3})
+        self.assertFalse(s >= t)
+
+
+class TestSetRelationalMethods(unittest.TestCase):
+
+    def test_issubset_proper_positive(self):
+        s = SortedSet({1, 2})
+        t = [1, 2, 3]
+        self.assertTrue(s.issubset(t))
+
+    def test_issubset_positive(self):
+        s = SortedSet({1, 2, 3})
+        t = [1, 2, 3]
+        self.assertTrue(s.issubset(t))
+
+    def test_issubset_negative(self):
+        s = SortedSet({1, 2, 3})
+        t = [1, 2]
+        self.assertFalse(s.issubset(t))
+
+    def test_issuperset_proper_positive(self):
+        s = SortedSet({1, 2, 3})
+        t = [1, 2]
+        self.assertTrue(s.issuperset(t))
+
+    def test_issuperset_positive(self):
+        s = SortedSet({1, 2, 3})
+        t = [1, 2, 3]
+        self.assertTrue(s.issuperset(t))
+
+    def test_issuperset_negative(self):
+        s = SortedSet({1, 2})
+        t = [1, 2, 3]
+        self.assertFalse(s.issuperset(t))
+
+
+class TestOperationsSetProtocol(unittest.TestCase):
+
+    def test_intersection(self):
+        s = SortedSet({1, 2, 3})
+        t = SortedSet({2, 3, 4})
+        self.assertEqual(s & t, SortedSet({2, 3}))
+
+    def test_union(self):
+        s = SortedSet({1, 2, 3})
+        t = SortedSet({2, 3, 4})
+        self.assertEqual(s | t, SortedSet({1, 2, 3, 4}))
+
+    def test_symmetric_difference(self):
+        s = SortedSet({1, 2, 3})
+        t = SortedSet({2, 3, 4})
+        self.assertEqual(s ^ t, SortedSet({1, 4}))
+
+    def test_difference(self):
+        s = SortedSet({1, 2, 3})
+        t = SortedSet({2, 3, 4})
+        self.assertEqual(s - t, SortedSet({1}))
+
+
+class TestSetOperationsMethods(unittest.TestCase):
+
+    def test_intersection(self):
+        s = SortedSet({1, 2, 3})
+        t = [2, 3, 4]
+        self.assertEqual(s.intersection(t), SortedSet({2, 3}))
+
+    def test_union(self):
+        s = SortedSet({1, 2, 3})
+        t = [2, 3, 4]
+        self.assertEqual(s.union(t), SortedSet({1, 2, 3, 4}))
+
+    def test_symmetric_difference(self):
+        s = SortedSet({1, 2, 3})
+        t = [2, 3, 4]
+        self.assertEqual(s.symmetric_difference(t), SortedSet({1, 4}))
+
+    def test_difference(self):
+        s = SortedSet({1, 2, 3})
+        t = [2, 3, 4]
+        self.assertEqual(s.difference(t), SortedSet({1}))
+
+    def test_isdisjoint_positive(self):
+        s = SortedSet({1, 2, 3})
+        t = [4, 5, 6]
+        self.assertTrue(s.isdisjoint(t))
+
+    def test_isdisjoint_negative(self):
+        s = SortedSet({1, 2, 3})
+        t = [3, 4, 5]
+        self.assertFalse(s.isdisjoint(t))
+
+
+class TestSetProtocol(unittest.TestCase):
+
+    def test_protocol(self):
+        self.assertTrue(issubclass(SortedSet, Set))
 
 if __name__ == '__main__':
     unittest.main()
